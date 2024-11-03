@@ -18,8 +18,8 @@ def fetch_price_data():
     # Otsi tabelist vastavad read ja veerud HTML-st
     rows = soup.find_all('tr')
     for row in rows:
-        cols = row.find_all('td')
-        if len(cols) >= 2:
+        cols = row.find_all('th')
+        if len(cols) >= 4:
             size_info = cols[0].get_text(strip=True)
             price_info = cols[1].get_text(strip=True)
             
