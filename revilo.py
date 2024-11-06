@@ -33,12 +33,10 @@ def revilo_hind(veljetüüp, mõõt, masin):
 
     return hind
 
-# Collect input
 veljetüüp = input("Sisesta veljetüüp (plekkvelg/valuvelg): ")
 mõõt = int(input("Sisesta veljemõõt numbrina: "))
 masin = input("Kas auto on linnamaastur/maastur? (jah/ei)? ")
 
-# Call the function and display the result
 rehvivahetuse_hind = revilo_hind(veljetüüp, mõõt, masin)
 
 if rehvivahetuse_hind is not None:
