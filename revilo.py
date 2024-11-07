@@ -28,8 +28,8 @@ def revilo_hind(veljetüüp, mõõt, masin):
             hind = maastur[5] if masin == 'jah' else sõiduauto[5]
         elif mõõt >= 21:
             hind = maastur[6] if masin == 'jah' else sõiduauto[6]
-        else:
-            hind = None 
+    else:
+        hind = None  
 
     return hind
 
