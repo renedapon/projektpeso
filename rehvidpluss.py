@@ -2,28 +2,6 @@ from bs4 import BeautifulSoup
 import requests
 import pandas as pd
 
-#url = 'https://www.rehvidpluss.com/EST/sisu/Rehvivahetuse+hinnakiri+-+P%C3%A4rnu'
-#page = requests.get(url)
-#soup = BeautifulSoup(page.text, 'html.parser')
-
-    
-#table = soup.find_all('table', class_="styled-table")[0]
-
-#header = table.find('thead')
-#body = table.find('tbody')
-
-#columns = [th.text.replace("-", "").replace('"', "").strip() for th in header.find_all('td')]
-
-#rows = []
-#for row in body.find_all('tr'):
-    #cells = [td.text.replace("€", "").strip() for td in row.find_all('td')]
-    #rows.append(cells)
-
-#df = pd.DataFrame(rows, columns=columns)
-
-#print(rows)
-#print(df)
-
 def hinnakiri(url):
     
     page = requests.get(url)
