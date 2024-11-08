@@ -42,7 +42,7 @@ def tarturehv_hind(veljetüüp, mõõt, masin):
     if hind is None:
         return 0  # Tagasta 0 kui hind pole saadaval
 
-    if masin == 'jah':
+    if masin == 'maastur':
         hind += 5
        
     return hind
@@ -62,23 +62,23 @@ def revilo_hind(veljetüüp, mõõt, masin):
     maastur = list(map(int, maastur))
 
     hind = None
-    if veljetüüp == 'plekkvelg' and masin == 'ei':
+    if veljetüüp == 'plekkvelg' and masin == 'sõiduauto':
         hind = sõiduauto[0]
-    elif veljetüüp == 'plekkvelg' and masin == 'jah':
+    elif veljetüüp == 'plekkvelg' and masin == 'maastur':
         hind = maastur[0]
     elif veljetüüp == 'valuvelg':
         if 13 <= mõõt <= 16:
-            hind = maastur[1] if masin == 'jah' else sõiduauto[1]
+            hind = maastur[1] if masin == 'maastur' else sõiduauto[1]
         elif mõõt == 17:
-            hind = maastur[2] if masin == 'jah' else sõiduauto[2]
+            hind = maastur[2] if masin == 'maastur' else sõiduauto[2]
         elif mõõt == 18:
-            hind = maastur[3] if masin == 'jah' else sõiduauto[3]
+            hind = maastur[3] if masin == 'maastur' else sõiduauto[3]
         elif mõõt == 19:
-            hind = maastur[4] if masin == 'jah' else sõiduauto[4]
+            hind = maastur[4] if masin == 'maastur' else sõiduauto[4]
         elif mõõt == 20:
-            hind = maastur[5] if masin == 'jah' else sõiduauto[5]
+            hind = maastur[5] if masin == 'maastur' else sõiduauto[5]
         elif mõõt >= 21:
-            hind = maastur[6] if masin == 'jah' else sõiduauto[6]
+            hind = maastur[6] if masin == 'maastur' else sõiduauto[6]
     
     return hind if hind is not None else 0  # Tagasta 0 kui hind pole saadaval
 
@@ -100,28 +100,28 @@ def rehvikas_hind(veljetüüp, mõõt, masin):
     if 12 <= mõõt <= 16 and veljetüüp == 'plekkvelg':
         hind = sõiduauto[0]
     elif veljetüüp == 'valuvelg':
-        if 12 <= mõõt <= 15 and masin == 'ei':
+        if 12 <= mõõt <= 15 and masin == 'sõiduauto':
             hind = sõiduauto[1]
-        elif 16 <= mõõt <= 17 and masin == 'ei':
+        elif 16 <= mõõt <= 17 and masin == 'sõiduauto':
             hind = sõiduauto[2]
-        elif 18 <= mõõt <= 19 and masin == 'ei':
+        elif 18 <= mõõt <= 19 and masin == 'sõiduauto':
             hind = sõiduauto[3]
-        elif 20 <= mõõt <= 21 and masin == 'ei':
+        elif 20 <= mõõt <= 21 and masin == 'sõiduauto':
             hind = sõiduauto[4]
-        elif mõõt == 22 and masin == 'ei':
+        elif mõõt == 22 and masin == 'sõiduauto':
             hind = sõiduauto[5]
-        elif 17 <= mõõt <= 18 and masin == 'jah':
+        elif 17 <= mõõt <= 18 and masin == 'maastur':
             hind = maastur[0]
-        elif 19 <= mõõt <= 21 and masin == 'jah':
+        elif 19 <= mõõt <= 21 and masin == 'maastur':
             hind = maastur[1]
-        elif mõõt == 22 and masin == 'jah':
+        elif mõõt == 22 and masin == 'maastur':
             hind = maastur[2]
     
     return hind if hind is not None else 0  # Tagasta 0 kui hind pole saadaval
 
 veljetüüp = input("Sisesta veljetüüp (plekkvelg/valuvelg): ")
 mõõt = int(input("Sisesta veljemõõt numbrina: "))
-masin = input("Kas auto on linnamaastur/maastur? (jah/ei)? ")
+masin = input("Sisesta sõidukitüüp (sõiduauto/maastur/kaubik): ")
 
 #Lisab sõnastikku hinnad ainult need töökojad, mis vastavad soovitud tingimustele
 if tarturehv_hind(veljetüüp, mõõt, masin) != 0:
