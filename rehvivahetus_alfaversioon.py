@@ -1,7 +1,23 @@
+################################################
+# Programmeerimine I
+# 2024/2025 sügissemester
+#
+# Projekt Peso
+# Teema: Soodsaima rehvivahetuse leidmine Tartus
+#
+#
+# Autorid: Karel Allik, Rene Dapon
+#
+# mõningane eeskuju: 
+#
+# Lisakommentaar (nt käivitusjuhend):
+# Vaja alla laadida beautifulsoup4 ja requests
+#
+##################################################
+
 from bs4 import BeautifulSoup
 import requests
 import pandas as pd
-
 
 hinnad = {}
 
@@ -121,31 +137,24 @@ def rehvikas_hind(veljetüüp, mõõt, masin):
     
     return hind if hind is not None else 0  # Tagasta 0 kui hind pole saadaval
 
-
-
-
-
 ########################
-
-
 
 def hinnakiri_RVT(url, klass):
     page = requests.get(url)
     soup = BeautifulSoup(page.text, 'html.parser')
 
-    table = soup.find_all('table', class_=klass)[0]
+    tabel = soup.find_all('table', class_=klass)[0]
 
-    header = table.find('thead')
-    body = table.find('tbody')
+    header = tabel.find('thead')
+    body = tabel.find('tbody')
 
-    columns = [th.text.replace("+", "").replace('“', "").strip() for th in header.find_all('th')] #.replace("-", "")
+    tulp = [th.text.replace("+", "").replace('“', "").strip() for th in header.find_all('th')] #.replace("-", "")
 
-    rows = []
-    for row in body.find_all('tr'):
-        cells = [td.text.replace("€", "").strip() for td in row.find_all('td')] 
-        rows.append(cells)    
-    return rows
-
+    read = []
+    for rida in body.find_all('tr'):
+        kast = [td.text.replace("€", "").strip() for td in rida.find_all('td')] 
+        read.append(kast)    
+    return read
 
 def rehvi_vahetuse_hind(masin, mõõt):
     # Määrab, milline järjend vastab valitud autole ja vahetuse tüübile
@@ -182,7 +191,6 @@ def rehvi_vahetuse_hind(masin, mõõt):
     
     return hind
     
-
 ##########################################################################################################################
     
 def hinnakiri(url):
@@ -190,21 +198,20 @@ def hinnakiri(url):
     page = requests.get(url)
     soup = BeautifulSoup(page.text, 'html.parser')
     
-    table = soup.find_all('table', class_="styled-table")[0]
+    tabel = soup.find_all('table', class_="styled-table")[0]
     
-    header = table.find('thead')
-    body = table.find('tbody')
+    header = tabel.find('thead')
+    body = tabel.find('tbody')
 
-    columns = [th.text.replace("-", "").replace('"', "").strip() for th in header.find_all('td')]
+    tulp = [th.text.replace("-", "").replace('"', "").strip() for th in header.find_all('td')]
 
-    rows = []
-    for row in body.find_all('tr'):
-        cells = [td.text.replace("€", "").strip() for td in row.find_all('td')]
-        rows.append(cells)
+    read = []
+    for rida in body.find_all('tr'):
+        kast = [td.text.replace("€", "").strip() for td in rida.find_all('td')]
+        read.append(kast)
         
-    return rows
+    return read
     
-
 def rehvi_vahetuse_hind1(masin, mõõt):
     
     # Määrab, milline järjend vastab valitud autole ja vahetuse tüübile
@@ -237,16 +244,13 @@ def rehvi_vahetuse_hind1(masin, mõõt):
     
     return hind
 
-
 url1 = 'https://www.rehvidpluss.com/EST/sisu/Rehvivahetuse+hinnakiri+-+P%C3%A4rnu'
 vastus1 = hinnakiri(url1)
 
 url = 'https://rehvivahetustartus.ee/?gclid=Cj0KCQiA57G5BhDUARIsACgCYnwIu5Ts1PqSfQFqXIW3A9XSTpxK6IPR5InQ9SigeuUhiOHvRCydkUwaAs8fEALw_wcB'
 klass = "tablepress tablepress-id-1"
 klass2 = "tablepress tablepress-id-2"
-
-
-    
+   
 #masin = input("Sisesta auto tüüp (sõiduauto/kaubik/maastur): ")
 #mõõt = int(input("Sisesta veljemõõt tollides: "))
 
@@ -262,8 +266,6 @@ if revilo_hind(veljetüüp, mõõt, masin) != 0:
 if rehvikas_hind(veljetüüp, mõõt, masin) != 0:
     hinnad["Rehvikas"] = rehvikas_hind(veljetüüp, mõõt, masin)
 
-
-
 if masin == 'sõiduauto':
     vastus_sõiduauto = hinnakiri_RVT(url, klass)
     hind = rehvi_vahetuse_hind(masin, mõõt)
@@ -276,7 +278,6 @@ elif masin == 'maastur' or masin =='kaubik':
     #print(f"{masin}  rehvivahetuse hind RehviVahetusTartus on {hind}€")
     hinnad["Rehvi Vahetus Tartus"] = hind
 
-
 if masin == 'sõiduauto' or masin == 'maastur' or masin == 'kaubik':
     hind2 = rehvi_vahetuse_hind1(masin, mõõt)
     if hind2 is not None:
@@ -285,10 +286,7 @@ if masin == 'sõiduauto' or masin == 'maastur' or masin == 'kaubik':
     else:
         print("Sobivat hinda ei leitud")
         
-
-    
 print(hinnad)
-
 
 odavaim_koht = min(hinnad, key=hinnad.get)
 odavaim_hind = hinnad[odavaim_koht]
