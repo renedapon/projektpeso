@@ -18,6 +18,7 @@ def hinnakiri(url):
     for row in body.find_all('tr'):
         cells = [td.text.replace("€", "").strip() for td in row.find_all('td')]
         rows.append(cells)
+    print(rows)
         
     return rows
     

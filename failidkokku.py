@@ -4,6 +4,9 @@ import pandas as pd
 
 
 hinnad = {}
+veljetüüp = input("Sisesta veljetüüp (plekkvelg/valuvelg): ")
+mõõt = int(input("Sisesta veljemõõt numbrina: "))
+masin = input("Sisesta sõidukitüüp (sõiduauto/maastur/kaubik): ")
 
 def tarturehv_hind(veljetüüp, mõõt, masin):
     try:
@@ -125,7 +128,7 @@ def rehvikas_hind(veljetüüp, mõõt, masin):
 
 
 
-########################
+######################## Rehvi vahetus Tartus ##################
 
 
 
@@ -183,7 +186,7 @@ def rehvi_vahetuse_hind(masin, mõõt):
     return hind
     
 
-##########################################################################################################################
+################################### Rehvid pluss #######################################################################################
     
 def hinnakiri(url):
     
@@ -245,14 +248,8 @@ url = 'https://rehvivahetustartus.ee/?gclid=Cj0KCQiA57G5BhDUARIsACgCYnwIu5Ts1PqS
 klass = "tablepress tablepress-id-1"
 klass2 = "tablepress tablepress-id-2"
 
+######################################################################################################################################
 
-    
-#masin = input("Sisesta auto tüüp (sõiduauto/kaubik/maastur): ")
-#mõõt = int(input("Sisesta veljemõõt tollides: "))
-
-veljetüüp = input("Sisesta veljetüüp (plekkvelg/valuvelg): ")
-mõõt = int(input("Sisesta veljemõõt numbrina: "))
-masin = input("Sisesta sõidukitüüp (sõiduauto/maastur/kaubik): ")
 
 #Lisab sõnastikku hinnad ainult need töökojad, mis vastavad soovitud tingimustele
 if tarturehv_hind(veljetüüp, mõõt, masin) != 0:
@@ -268,13 +265,13 @@ if masin == 'sõiduauto':
     vastus_sõiduauto = hinnakiri_RVT(url, klass)
     hind = rehvi_vahetuse_hind(masin, mõõt)
     #print(f"Sõiduauto rehvivahetuse hind RehviVahetusTartus on {hind}€")
-    hinnad["Rehvi Vahetus Tartus"] = hind
+    hinnad["Rehvi Vahetus Tartus (RPM MOTORS)"] = hind
     
 elif masin == 'maastur' or masin =='kaubik':
     vastus_maastur_kaubik = hinnakiri_RVT(url, klass2)
     hind = rehvi_vahetuse_hind(masin, mõõt)
     #print(f"{masin}  rehvivahetuse hind RehviVahetusTartus on {hind}€")
-    hinnad["Rehvi Vahetus Tartus"] = hind
+    hinnad["Rehvi Vahetus Tartus (RPM MOTORS)"] = hind
 
 
 if masin == 'sõiduauto' or masin == 'maastur' or masin == 'kaubik':
@@ -284,13 +281,114 @@ if masin == 'sõiduauto' or masin == 'maastur' or masin == 'kaubik':
         hinnad["Rehvid Pluss"] = hind2
     else:
         print("Sobivat hinda ei leitud")
+ 
+################## OÜ Kummisepp ########################
         
+if masin == "sõiduauto":
+    if mõõt <= 16:
+        hinnad["OÜ Kummisepp"] = 60
+    elif mõõt == 17:
+        hinnad["OÜ Kummisepp"] = 66
+    elif 18 <= mõõt <= 19:
+        hinnad["OÜ Kummisepp"] = 78
+    elif mõõt >= 20:
+        hinnad["OÜ Kummisepp"] = 90
+if masin == "maastur" or masin == "kaubik":
+    if mõõt <= 17:
+        hinnad["OÜ Kummisepp"] = 76
+    if 18 <= mõõt <= 19:
+        hinnad["OÜ Kummisepp"] = 78
+    if mõõt >= 20:
+        hinnad["OÜ Kummisepp"] = 90
+        
+######### Rehvix OÜ #################################
+        
+if masin == "maastur":
+    if mõõt <= 21:
+        hinnad["Rehvix OÜ"] = 60
+if masin == "kaubik":
+    if mõõt <= 21:
+        hinnad["Rehvix OÜ"] = 55
+if masin == "sõiduauto":
+    if mõõt <= 21:
+        if veljetüüp == "plekkvelg":  
+            hinnad["Rehvix OÜ"] = 50
+        if veljetüüp == "valuvelg":  
+            hinnad["Rehvix OÜ"] = 50
+            
+######## Aalux Rehvitöökoda ######################
+            
 
+url = 'https://www.aalux.ee/hinnakiri/3'
+
+def hinnakiri(url):
     
-print(hinnad)
+    page = requests.get(url)
+    soup = BeautifulSoup(page.text, 'html.parser')
+    
+    table_container = soup.find_all('div', class_="table-responsive")
+    table = table_container[0].find('table')
+    #print(table)
+    
+    rows = table.find_all('tr')
+    #print(rows)
+    data = []
+    for row in rows:
+        cells = row.find_all(['td', 'th'])
+        row_data = [cell.get_text(strip=True).replace('\xa0', '').replace('...', '').replace("''", '').replace(' €', '').replace('"', '') for cell in cells]
+        if row_data and row_data[0] == "Rataste vahetus +tasakaal":
+            break
+        data.append(row_data)
+    #print(data)   
+    return data
+       
+def rehvi_vahetuse_hind_AALUX(masin, mõõt):
+    
+    if masin == 'sõiduauto':
+        järjend = uus[0]
+    elif masin == 'maastur':
+        järjend = uus[2]
+    elif masin == 'kaubik':
+        järjend = uus[2]
+    
+    if mõõt <= 15:
+        hind = int(järjend[1])
+    elif mõõt == 16:
+        hind = int(järjend[2])
+    elif mõõt == 17:
+        hind = int(järjend[3])
+    elif mõõt == 18:
+        hind = int(järjend[4])
+    elif mõõt == 19:
+        hind = int(järjend[5])
+    elif mõõt == 20:
+        hind = int(järjend[6])
+    elif mõõt == 21:
+        hind = int(järjend[7])
+    elif mõõt == 21:
+        hind = int(järjend[8])
+    else:
+        hind = 0  # Kui mõõt ei sobi, tagastame 0
+    return hind
+
+algne = hinnakiri(url)
+uus = algne[2:]
+
+#print(uus)
+
+hind_Aalux = rehvi_vahetuse_hind_AALUX(masin, mõõt)
+hinnad["Aalux Rehvitöökoda"] = hind_Aalux   
+
+
+
+###################################################
+
+
 
 
 odavaim_koht = min(hinnad, key=hinnad.get)
 odavaim_hind = hinnad[odavaim_koht]
 
 print(f"Odavaim rehvitöökoda on {odavaim_koht}, kus maksab Teie sisestatud andmetega rehvivahetus {odavaim_hind} eurot.")
+
+print(hinnad)
