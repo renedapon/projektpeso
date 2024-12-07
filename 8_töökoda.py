@@ -137,9 +137,47 @@ def rehvikas_hind(veljetüüp, mõõt, masin):
     
     return hind if hind is not None else 0  # Tagasta 0 kui hind pole saadaval
 
+def rehvidtartus24(veljetüüp, mõõt, masin):
+    try:
+        rehvidtartus24 = requests.get("https://rehvidtartus24.ee/hinnad/")
+        rehvidtartus24.raise_for_status()
+        soup = BeautifulSoup(rehvidtartus24.text, "html.parser")
+    except requests.RequestException as e:
+        print(f"rehvidtartus24: Veebilehe laadimine ebaõnnestus: {e}")
+        return None
+    
+    plekkvelg = [tag.text.replace('.-', '').strip() for tag in soup.find_all("td")[1:3]]
+    plekkvelg = list(map(int, plekkvelg))
+    valuvelg = [tag.text.replace('.-', '').strip() for tag in soup.find_all("td")[8:13]]
+    valuvelg = list(map(int, valuvelg))
+    
+    hind = 0
+    #vastava hinna leidmine
+    if veljetüüp == 'plekkvelg':
+        if 13 <= mõõt <= 16:
+            hind = plekkvelg[0]
+        elif mõõt == 17:
+            hind = plekkvelg[1]
+    elif veljetüüp == 'valuvelg':
+        if 13 <= mõõt <= 16:
+            hind = valuvelg[0]
+        elif mõõt == 17:
+            hind = valuvelg[1]
+        elif mõõt == 18:
+            hind = valuvelg[2]
+        elif mõõt == 19:
+            hind = valuvelg[3]
+        elif mõõt == 20:
+            hind = valuvelg[4]
+        elif mõõt >= 21:
+            hind = valuvelg[5]
+    
+    if masin == 'maastur':
+        hind += 5
+        
+    return hind if hind is not None else 0
+
 #<<<<<<< HEAD:failidkokku.py
-
-
 
 
 ######################## Rehvi vahetus Tartus ##################
@@ -284,6 +322,8 @@ if revilo_hind(veljetüüp, mõõt, masin) != 0:
     hinnad["Revilo"] = revilo_hind(veljetüüp, mõõt, masin)
 if rehvikas_hind(veljetüüp, mõõt, masin) != 0:
     hinnad["Rehvikas"] = rehvikas_hind(veljetüüp, mõõt, masin)
+if rehvidtartus24(veljetüüp, mõõt, masin) != 0:
+    hinnad["Rehvidtartus24"] = rehvidtartus24(veljetüüp, mõõt, masin)
 
 if masin == 'sõiduauto':
     vastus_sõiduauto = hinnakiri_RVT(url, klass)
