@@ -134,7 +134,7 @@ def rehvidtartus24(veljetüüp, mõõt, masin):
     
     plekkvelg = [tag.text.replace('.-', '').strip() for tag in soup.find_all("td")[1:3]]
     plekkvelg = list(map(int, plekkvelg))
-    valuvelg = [tag.text.replace('.-', '').strip() for tag in soup.find_all("td")[8:13]]
+    valuvelg = [tag.text.replace('.-', '').strip() for tag in soup.find_all("td")[8:14]]
     valuvelg = list(map(int, valuvelg))
     
     hind = 0
@@ -158,8 +158,10 @@ def rehvidtartus24(veljetüüp, mõõt, masin):
         elif mõõt >= 21:
             hind = valuvelg[5]
     
-    if masin == 'maastur':
+    if masin == 'maastur' and hind != 0:
         hind += 5
+    elif masin == 'kaubik':
+        return 0
         
     return hind if hind is not None else 0
     pass
@@ -182,19 +184,20 @@ def hinnakiri_RVT(url, klass):
     return read
     pass
 
-def rehvi_vahetuse_hind(masin, mõõt):
-    global vastus_sõiduauto
-    global vastus_maastur
+
+def rehvi_vahetuse_hind_RVT(masin, mõõt):
+    global järjend_suur
+
+    
+    
     if masin == 'sõiduauto':
-        järjend = vastus_sõiduauto[0]
+        järjend = järjend_suur[0]
     
     elif masin == 'maastur' or masin == 'kaubik':
-        järjend = vastus_maastur_kaubik[0]
+        järjend = järjend_suur[0]
     else:    
         print("Sobivat kombinatsiooni ei leitud.")
         return None
-    
-    #Määrab velje mõõdu järgi järjendis asuva hinna ja tagastab selle
     
     if mõõt <= 15:
         hind = int(järjend[1])
@@ -213,16 +216,19 @@ def rehvi_vahetuse_hind(masin, mõõt):
     elif mõõt >= 22:
         hind = int(järjend[6])
     else:
-        hind = 0  # Kui mõõt ei sobi, tagastame 0
+        hind = 0  
     
     return hind
     pass
 
-def hinnakiri(url):
+
+def hinnakiri_rehvidpluss(url):
+    
     page = requests.get(url)
     soup = BeautifulSoup(page.text, 'html.parser')
-    tabelid = soup.find_all('table', class_="styled-table")
-    tabel = tabelid[0]
+    
+    tabel = soup.find_all('table', class_="styled-table")[0]
+    
     header = tabel.find('thead')
     body = tabel.find('tbody')
 
@@ -232,20 +238,21 @@ def hinnakiri(url):
     for rida in body.find_all('tr'):
         kast = [td.text.replace("€", "").strip() for td in rida.find_all('td')]
         read.append(kast)
-        
     return read
     pass
 
-def rehvi_vahetuse_hind1(masin, mõõt):
-    url1 = 'https://www.rehvidpluss.com/EST/sisu/Rehvivahetuse+hinnakiri+-+P%C3%A4rnu'
-    vastus1 = hinnakiri(url1)
-    # Määrab, milline järjend vastab valitud autole ja vahetuse tüübile
+
+def rehvi_vahetuse_hind_rehvidpluss(masin, mõõt):
+    
+    url = 'https://www.rehvidpluss.com/EST/sisu/Rehvivahetuse+hinnakiri+-+P%C3%A4rnu'
+    vastus_rehvidpluss = hinnakiri_rehvidpluss(url)
+    
     if masin == 'sõiduauto':
-        järjend = vastus1[0]
+        järjend = vastus_rehvidpluss[0]
     elif masin == 'maastur':
-        järjend = vastus1[1]
+        järjend = vastus_rehvidpluss[1]
     elif masin == 'kaubik':
-        järjend = vastus1[2]
+        järjend = vastus_rehvidpluss[2]
     else:
         print("Sobivat kombinatsiooni ei leitud.")
         return None
@@ -265,12 +272,34 @@ def rehvi_vahetuse_hind1(masin, mõõt):
     elif mõõt >= 21:
         hind = int(järjend[7])
     else:
-        hind = 0  # Kui mõõt ei sobi, tagastame 0
+        hind = 0  
     
     return hind
     pass
+def hinnakiri_AALUX(url):
+    
+    page = requests.get(url)
+    soup = BeautifulSoup(page.text, 'html.parser')
+    
+    table_container = soup.find_all('div', class_="table-responsive")
+    table = table_container[0].find('table')
+    #print(table)
+    
+    rows = table.find_all('tr')
+    #print(rows)
+    data = []
+    for row in rows:
+        cells = row.find_all(['td', 'th'])
+        row_data = [cell.get_text(strip=True).replace('\xa0', '').replace('...', '').replace("''", '').replace(' €', '').replace('"', '') for cell in cells]
+        if row_data and row_data[0] == "Rataste vahetus +tasakaal":
+            break
+        data.append(row_data)
+    #print(data)   
+    return data
+    pass
 
 def rehvi_vahetuse_hind_AALUX(masin, mõõt):
+    global uus
     if masin == 'sõiduauto':
         järjend = uus[0]
     elif masin == 'maastur':
@@ -303,7 +332,7 @@ def rehvi_vahetuse_hind_AALUX(masin, mõõt):
 class RehviVahetusApp(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Rehvi Vahetus Hindade Võrdlus")
+        self.title("Rehvivahetuse Hinnavõrdlus Tartus")
         self.geometry("400x300")
 
         # Create and place widgets
@@ -328,10 +357,14 @@ class RehviVahetusApp(tk.Tk):
         # Calculate button
         self.calculate_button = ttk.Button(self, text="Arvuta", command=self.calculate)
         self.calculate_button.grid(column=0, row=3, columnspan=2, padx=10, pady=20)
+    
+    
 
     def calculate(self):
+        global järjend_suur
         global vastus_sõiduauto
         global vastus_maastur
+        global uus
         veljetüüp = self.veljetüüp.get()
         mõõt = int(self.veljemõõt.get())
         masin = self.sõidukitüüp.get()
@@ -346,21 +379,22 @@ class RehviVahetusApp(tk.Tk):
             hinnad["Rehvikas"] = rehvikas_hind(veljetüüp, mõõt, masin)
         if rehvidtartus24(veljetüüp, mõõt, masin) != 0:
             hinnad["Rehvidtartus24"] = rehvidtartus24(veljetüüp, mõõt, masin)
-        url = 'https://rehvivahetustartus.ee/?gclid=Cj0KCQiA57G5BhDUARIsACgCYnwIu5Ts1PqSfQFqXIW3A9XSTpxK6IPR5InQ9SigeuUhiOHvRCydkUwaAs8fEALw_wcB'
-        klass = "tablepress tablepress-id-1"
-        klass2 = "tablepress tablepress-id-2"
+        url_RVT = 'https://rehvivahetustartus.ee/?gclid=Cj0KCQiA57G5BhDUARIsACgCYnwIu5Ts1PqSfQFqXIW3A9XSTpxK6IPR5InQ9SigeuUhiOHvRCydkUwaAs8fEALw_wcB'
+        klass_RVT1 = "tablepress tablepress-id-1"
+        klass_RVT2 = "tablepress tablepress-id-2"
+        
         if masin == 'sõiduauto':
-            vastus_sõiduauto = hinnakiri_RVT(url, klass)
-            hind = rehvi_vahetuse_hind(masin, mõõt)
+            järjend_suur = hinnakiri_RVT(url_RVT, klass_RVT1)
+            hind = rehvi_vahetuse_hind_RVT(masin, mõõt)
             hinnad["Rehvi Vahetus Tartus (RPM MOTORS)"] = hind
 
         elif masin == 'maastur' or masin =='kaubik':
-            vastus_maastur_kaubik = hinnakiri_RVT(url, klass2)
-            hind = rehvi_vahetuse_hind(masin, mõõt)
+            järjend_suur = hinnakiri_RVT(url_RVT, klass_RVT2)
+            hind = rehvi_vahetuse_hind_RVT(masin, mõõt)
             hinnad["Rehvi Vahetus Tartus (RPM MOTORS)"] = hind
 
         if masin == 'sõiduauto' or masin == 'maastur' or masin == 'kaubik':
-            hind2 = rehvi_vahetuse_hind1(masin, mõõt)
+            hind2 = rehvi_vahetuse_hind_rehvidpluss(masin, mõõt)
             if hind2 is not None:
                 hinnad["Rehvid Pluss"] = hind2
 
@@ -393,8 +427,11 @@ class RehviVahetusApp(tk.Tk):
                     hinnad["Rehvix OÜ"] = 50
                 if veljetüüp == "valuvelg":  
                     hinnad["Rehvix OÜ"] = 50
+                    
+                    
+        url_AALUX = 'https://www.aalux.ee/hinnakiri/3'
 
-        algne = hinnakiri(url)
+        algne = hinnakiri_AALUX(url_AALUX)
         uus = algne[2:]
 
         hind_Aalux = rehvi_vahetuse_hind_AALUX(masin, mõõt)

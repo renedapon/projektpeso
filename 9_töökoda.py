@@ -19,7 +19,10 @@ from bs4 import BeautifulSoup
 import requests
 import pandas as pd
 
+
 hinnad = {}
+
+
 
 def tarturehv_hind(veljetüüp, mõõt, masin):
     try:
@@ -206,10 +209,10 @@ def rehvi_vahetuse_hind(masin, mõõt):
     # Määrab, milline järjend vastab valitud autole ja vahetuse tüübile
     
     if masin == 'sõiduauto':
-        järjend = vastus_sõiduauto[0]
+        järjend = järjend_suur[0]
     
     elif masin == 'maastur' or masin == 'kaubik':
-        järjend = vastus_maastur_kaubik[0]
+        järjend = järjend_suur[0]
     else:    
         print("Sobivat kombinatsiooni ei leitud.")
         return None
@@ -313,6 +316,7 @@ klass2 = "tablepress tablepress-id-2"
 veljetüüp = input("Sisesta veljetüüp (plekkvelg/valuvelg): ")
 mõõt = int(input("Sisesta veljemõõt numbrina: "))
 masin = input("Sisesta sõidukitüüp (sõiduauto/maastur/kaubik): ")
+
 #>>>>>>> 5930cab932588236fa3b0b887d1f24324ae509d5:rehvivahetus_alfaversioon.py
 
 #Lisab sõnastikku hinnad ainult need töökojad, mis vastavad soovitud tingimustele
@@ -326,13 +330,13 @@ if rehvidtartus24(veljetüüp, mõõt, masin) != 0:
     hinnad["Rehvidtartus24"] = rehvidtartus24(veljetüüp, mõõt, masin)
 
 if masin == 'sõiduauto':
-    vastus_sõiduauto = hinnakiri_RVT(url, klass)
+    järjend_suur = hinnakiri_RVT(url, klass)
     hind = rehvi_vahetuse_hind(masin, mõõt)
     #print(f"Sõiduauto rehvivahetuse hind RehviVahetusTartus on {hind}€")
     hinnad["Rehvi Vahetus Tartus (RPM MOTORS)"] = hind
     
 elif masin == 'maastur' or masin =='kaubik':
-    vastus_maastur_kaubik = hinnakiri_RVT(url, klass2)
+    järjend_suur = hinnakiri_RVT(url, klass2)
     hind = rehvi_vahetuse_hind(masin, mõõt)
     #print(f"{masin}  rehvivahetuse hind RehviVahetusTartus on {hind}€")
     hinnad["Rehvi Vahetus Tartus (RPM MOTORS)"] = hind
@@ -458,4 +462,17 @@ odavaim_hind = hinnad[odavaim_koht]
 print(f"Odavaim rehvitöökoda on {odavaim_koht}, kus maksab Teie sisestatud andmetega rehvivahetus {odavaim_hind} eurot.")
 
 print(hinnad)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
